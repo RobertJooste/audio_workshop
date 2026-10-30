@@ -1,0 +1,8 @@
+PyMuPDF
+ebooklib
+beautifulsoup4
+kokoro-onnx
+sounddevice
+soundfile
+numpy
+Flask>=3.0,<4.0
