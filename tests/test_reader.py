@@ -8,8 +8,13 @@ import epub_pdf_tts_reader as reader
 from ebooklib import epub
 import numpy as np
 import soundfile as sf
-import termios
-import tty
+
+try:
+    import termios
+    import tty
+except ImportError:
+    termios = None
+    tty = None
 
 
 class EpubExtractionTests(unittest.TestCase):
@@ -341,6 +346,7 @@ class AudioOutputTests(unittest.TestCase):
             self.assertTrue(np.all(samples[pause_start:pause_end] == 0))
             self.assertAlmostEqual(samples[pause_end], 1, places=4)
 
+    @unittest.skipIf(termios is None or tty is None, 'Requires POSIX terminal controls.')
     def test_space_pauses_and_continues_audio_playback(self):
         samples = np.array([0.1, 0.2, 0.3], dtype=np.float32)
         input_stream = MagicMock()

@@ -65,6 +65,25 @@ processed/The Eye of the World/Bella - af_bella/Book 0123456789abcdef/Settings 0
 
 Different source books and custom settings are kept separate to avoid reusing the wrong audio. The web app accepts EPUB files up to 100 MB and binds to `127.0.0.1` by default, so it is intended for use on the same computer. Uploaded books and job state are stored locally under `~/.cache/epub-tts-web`; unused previews expire after one hour, stopped or failed jobs expire after one day, and paused jobs are automatically stopped after one day of inactivity. Expired data is cleaned up on subsequent app requests.
 
+## Desktop packages
+
+Tagged GitHub releases build double-clickable installers for Windows x64, macOS Apple Silicon, and macOS Intel. The Windows installer creates a Start menu shortcut (and offers an optional desktop shortcut); the macOS disk image contains the app, which can be dragged into Applications or opened directly. The desktop app opens the local interface in the default browser. Use **Quit app** in the page to stop it cleanly.
+
+The installers do not include the Kokoro model. On first use, the app downloads the model and voices (about 192 MB), so an internet connection is required; later launches use the cached files. Audiobooks are saved under `~/Audiobooks`, while app data and logs are stored in the operating system's per-user data folders. The packages are currently unsigned: Windows may show a SmartScreen warning, and macOS may require approval in Privacy & Security or opening the app with Control-click.
+
+To create a release, push a version tag such as `v0.1.0`. GitHub Actions runs the tests, builds all three platform packages, and attaches them to a GitHub Release. You can also run the workflow manually to build downloadable artifacts without publishing a release.
+
+To build the desktop app locally:
+
+```sh
+python3 -m venv venv
+source venv/bin/activate
+python -m pip install -r requirements-build.txt
+python scripts/build_desktop.py
+```
+
+The build produces a macOS `.app` bundle on macOS and a Windows `.exe` on Windows. The installer and disk-image wrappers are created by the release workflow.
+
 ## Command-line reader
 
 Read and play an EPUB or PDF:

@@ -7,6 +7,7 @@ import json
 import logging
 import math
 import re
+import secrets
 import threading
 import time
 import uuid
@@ -555,9 +556,11 @@ def create_app(
     model=None,
     storage_root: Path | None = None,
     output_root: Path | None = None,
+    desktop_shutdown_token: str | None = None,
 ) -> Flask:
     app = Flask(__name__)
     app.config['MAX_CONTENT_LENGTH'] = _MAX_UPLOAD_BYTES
+    app.config['DESKTOP_SHUTDOWN_TOKEN'] = desktop_shutdown_token
     effective_storage_root = storage_root or Path.home() / '.cache' / 'epub-tts-web'
     manager = JobManager(
         effective_storage_root,
@@ -576,7 +579,10 @@ def create_app(
 
     @app.get('/')
     def index():
-        return render_template('index.html')
+        return render_template(
+            'index.html',
+            desktop_shutdown_token=desktop_shutdown_token,
+        )
 
     @app.get('/api/voices')
     def list_voices():
@@ -718,6 +724,20 @@ def create_app(
         if Path(filename).name != filename or filename not in job.outputs:
             abort(404)
         return send_from_directory(job.output_dir, filename, as_attachment=True)
+
+    @app.post('/api/shutdown')
+    def shutdown_desktop_app():
+        expected_token = app.config['DESKTOP_SHUTDOWN_TOKEN']
+        if expected_token is None:
+            abort(404)
+        provided_token = request.headers.get('X-Desktop-Shutdown-Token', '')
+        if not secrets.compare_digest(provided_token, expected_token):
+            abort(403)
+        shutdown = app.config.get('DESKTOP_SHUTDOWN_CALLBACK')
+        if not callable(shutdown):
+            return jsonify({'error': 'The desktop app cannot be shut down right now.'}), 503
+        threading.Thread(target=shutdown, daemon=True).start()
+        return jsonify({'message': 'The desktop app is shutting down.'})
 
     @app.errorhandler(413)
     def upload_too_large(error):

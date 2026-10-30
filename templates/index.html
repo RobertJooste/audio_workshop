@@ -72,6 +72,8 @@
       background: #7d916e;
       content: "";
     }
+    .topbar-actions { display: flex; align-items: center; gap: 10px; }
+    .quit-app { min-height: 36px; padding: 7px 11px; font-size: 11px; }
     .hero { max-width: 700px; margin-bottom: 30px; }
     .eyebrow {
       margin: 0 0 12px;
@@ -306,7 +308,12 @@
           <div class="brand-caption">A private studio for your books</div>
         </div>
       </div>
-      <span class="local-badge">Runs on this computer</span>
+      <div class="topbar-actions">
+        <span class="local-badge">Runs on this computer</span>
+        {% if desktop_shutdown_token %}
+        <button id="quit-app" class="secondary quit-app" type="button">Quit app</button>
+        {% endif %}
+      </div>
     </header>
     <section class="hero">
       <p class="eyebrow">Your book, beautifully read</p>
@@ -434,6 +441,7 @@
     const form = document.querySelector('#start-form');
     const voiceSelect = document.querySelector('#voice');
     const blendVoiceSelect = document.querySelector('#blend-voice');
+    const desktopShutdownToken = {{ desktop_shutdown_token|tojson }};
     const blendPercent = document.querySelector('#blend-percent');
     const startButton = document.querySelector('#start');
     const previewButton = document.querySelector('#preview');
@@ -701,6 +709,24 @@
     document.querySelector('#pause').addEventListener('click', () => control('pause'));
     document.querySelector('#resume').addEventListener('click', () => control('resume'));
     document.querySelector('#stop').addEventListener('click', () => control('stop'));
+
+    const quitButton = document.querySelector('#quit-app');
+    if (quitButton) {
+      quitButton.addEventListener('click', async () => {
+        if (!window.confirm('Quit EPUB Audiobook Maker? Active generation will stop.')) return;
+        quitButton.disabled = true;
+        try {
+          await api('/api/shutdown', {
+            method: 'POST',
+            headers: { 'X-Desktop-Shutdown-Token': desktopShutdownToken },
+          });
+          document.body.innerHTML = '<main style="font:16px system-ui;padding:48px;color:#242323"><h1>App closed</h1><p>You can close this browser tab.</p></main>';
+        } catch (error) {
+          quitButton.disabled = false;
+          document.querySelector('#error').textContent = error.message;
+        }
+      });
+    }
 
     loadVoices().then(async () => {
       const savedJobId = localStorage.getItem('epub-tts-job-id');

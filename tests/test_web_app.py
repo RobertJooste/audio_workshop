@@ -136,6 +136,28 @@ class WebAppTests(unittest.TestCase):
         )
         self.assertEqual(invalid.status_code, 400)
 
+    def test_desktop_shutdown_requires_the_launch_token(self):
+        shutdown_requested = threading.Event()
+        app = web_app.create_app(
+            model=FakeModel(),
+            storage_root=self.root / 'desktop-data',
+            output_root=self.root / 'desktop-output',
+            desktop_shutdown_token='test-shutdown-token',
+        )
+        app.config['TESTING'] = True
+        app.config['DESKTOP_SHUTDOWN_CALLBACK'] = shutdown_requested.set
+        client = app.test_client()
+
+        self.assertEqual(client.post('/api/shutdown').status_code, 403)
+        response = client.post(
+            '/api/shutdown',
+            headers={'X-Desktop-Shutdown-Token': 'test-shutdown-token'},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(shutdown_requested.wait(timeout=1))
+        self.assertEqual(self.client.post('/api/shutdown').status_code, 404)
+
     def test_selected_chapters_only_are_synthesized_and_downloaded(self):
         multi_epub_path = self.root / 'multi.epub'
         self._create_multi_chapter_epub(multi_epub_path)
