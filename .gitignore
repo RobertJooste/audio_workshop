@@ -21,3 +21,8 @@ instance/
 .coverage
 htmlcov/
 .pytest_cache/
+
+# Local-only notes (never uploaded)
+buymeacoffee-checklist.md
+project.md
+web_app_review.md
