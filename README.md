@@ -1,6 +1,11 @@
 # EPUB Audiobook Maker
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Ko-fi](https://img.shields.io/badge/Ko--fi-Support%20me-ff5e5b?logo=ko-fi&logoColor=white)](https://ko-fi.com/robertjooste)
+
 Turn an EPUB or PDF into chapter-by-chapter WAV audio using the local Kokoro ONNX text-to-speech model. The project includes a browser-based interface for EPUB books and a command-line reader for EPUB and PDF.
+
+If this project is useful to you, you can [buy me a coffee on Ko-fi](https://ko-fi.com/robertjooste) — it helps keep development going.
 
 Audio is generated locally by Kokoro. You do not need an API key or a cloud TTS account. The first run downloads the Kokoro model and voice data.
 The app uses the Kokoro v1.0 fp16 model and its matching voice bundle (about 192 MB total); English voices include `af_heart`. The app supports American and British English narration.
@@ -140,3 +145,9 @@ Run the test suite from the project directory:
 ```
 
 Tests cover EPUB extraction and chapter selection, text chunking, audio export and resume, and web upload, progress controls, and file downloads.
+
+## License
+
+This project is released under the [MIT License](LICENSE).
+
+It uses the [Kokoro-82M](https://huggingface.co/hexgrad/Kokoro-82M) text-to-speech model (Apache-2.0 licensed weights) via the [kokoro-onnx](https://github.com/thewh1teagle/kokoro-onnx) wrapper (MIT). The model and voice files are downloaded on first use and are not bundled with this repository.
