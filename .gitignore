@@ -23,6 +23,6 @@ htmlcov/
 .pytest_cache/
 
 # Local-only notes (never uploaded)
-buymeacoffee-checklist.md
+kofi-checklist.md
 project.md
 web_app_review.md
