@@ -65,7 +65,7 @@ processed/<Book Title>/<Voice Name - Voice ID>/Book <content hash>/Settings <set
 For example:
 
 ```text
-processed/The Eye of the World/Bella - af_bella/Book 0123456789abcdef/Settings 0123456789ab/
+processed/Pride and Prejudice/Bella - af_bella/Book 0123456789abcdef/Settings 0123456789ab/
 ```
 
 Different source books and custom settings are kept separate to avoid reusing the wrong audio. The web app accepts EPUB files up to 100 MB and binds to `127.0.0.1` by default, so it is intended for use on the same computer. Uploaded books and job state are stored locally under `~/.cache/epub-tts-web`; unused previews expire after one hour, stopped or failed jobs expire after one day, and paused jobs are automatically stopped after one day of inactivity. Expired data is cleaned up on subsequent app requests.
