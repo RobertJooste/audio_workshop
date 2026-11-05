@@ -1,4 +1,4 @@
-name: Build desktop packages
+name: Build portable desktop downloads
 
 on:
   workflow_dispatch:
@@ -24,9 +24,12 @@ jobs:
           - os: macos-15-intel
             platform: macos
             architecture: x64
+          - os: ubuntu-22.04
+            platform: linux
+            architecture: x64
     runs-on: ${{ matrix.os }}
     env:
-      APP_VERSION: ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || '0.1.0' }}
+      APP_VERSION: ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || '0.2.0' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -39,23 +42,13 @@ jobs:
       - name: Build desktop app
         run: python scripts/build_desktop.py --version "$APP_VERSION"
         shell: bash
-      - name: Build Windows installer
-        if: matrix.platform == 'windows'
-        shell: pwsh
-        run: |
-          choco install innosetup --yes --no-progress
-          New-Item -ItemType Directory -Force artifacts | Out-Null
-          & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" "/DAppVersion=$env:APP_VERSION" "/Oartifacts" "packaging/windows.iss"
-      - name: Build macOS disk image
-        if: matrix.platform == 'macos'
-        run: scripts/package_macos.sh
+      - name: Package portable download
+        run: python scripts/package_portable.py --platform "${{ matrix.platform }}" --architecture "${{ matrix.architecture }}"
         shell: bash
-        env:
-          MAC_ARCH: ${{ matrix.architecture }}
       - uses: actions/upload-artifact@v4
         with:
           name: EPUB-Audiobook-Maker-${{ matrix.platform }}-${{ matrix.architecture }}
-          path: artifacts/*
+          path: artifacts/EPUB-Audiobook-Maker-*
           if-no-files-found: error
 
   release:

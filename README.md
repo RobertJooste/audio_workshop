@@ -72,11 +72,15 @@ Different source books and custom settings are kept separate to avoid reusing th
 
 ## Desktop packages
 
-Tagged GitHub releases build double-clickable installers for Windows x64, macOS Apple Silicon, and macOS Intel. The Windows installer creates a Start menu shortcut (and offers an optional desktop shortcut); the macOS disk image contains the app, which can be dragged into Applications or opened directly. The desktop app opens the local interface in the default browser. Use **Quit app** in the page to stop it cleanly.
+Tagged GitHub releases provide portable downloads for Windows x64, macOS Apple Silicon, macOS Intel, and Linux x64. There is no installer:
 
-The installers do not include the Kokoro model. On first use, the app downloads the model and voices (about 192 MB), so an internet connection is required; later launches use the cached files. Audiobooks are saved under `~/Audiobooks`, while app data and logs are stored in the operating system's per-user data folders. The packages are currently unsigned: Windows may show a SmartScreen warning, and macOS may require approval in Privacy & Security or opening the app with Control-click.
+- **Windows:** Download and double-click the `.exe`.
+- **macOS:** Download and unzip the `.zip`, then double-click `EPUB Audiobook Maker.app`. You can keep it in Downloads or move it to Applications.
+- **Linux:** Download and extract the `.tar.gz`, then double-click the `EPUB Audiobook Maker` executable. Some desktop environments require allowing the file to run, or launching it from a terminal.
 
-To create a release, push a version tag such as `v0.1.0`. GitHub Actions runs the tests, builds all three platform packages, and attaches them to a GitHub Release. You can also run the workflow manually to build downloadable artifacts without publishing a release.
+The portable builds do not include the Kokoro model. On first use, the app downloads the model and voices (~192 MB), so an internet connection is required; later launches use the cached files. Audiobooks are saved under `~/Audiobooks`, while app data and logs are stored in the operating system's per-user data folders. The apps are unsigned: Windows may show a SmartScreen warning, and macOS may require approval in Privacy & Security or opening the app with Control-click. Linux builds target x64 systems compatible with Ubuntu 22.04's glibc.
+
+To create a release, push a version tag such as `v0.2.0`. GitHub Actions runs the tests, builds all four platform variants, and attaches the portable downloads to a GitHub Release. You can also run the workflow manually to build downloadable artifacts without publishing a release.
 
 To build the desktop app locally:
 
@@ -87,7 +91,7 @@ python -m pip install -r requirements-build.txt
 python scripts/build_desktop.py
 ```
 
-The build produces a macOS `.app` bundle on macOS and a Windows `.exe` on Windows. The installer and disk-image wrappers are created by the release workflow.
+The build produces a macOS `.app` bundle on macOS and a standalone executable on Windows or Linux. Run `python scripts/package_portable.py --platform <windows|macos|linux> --architecture <x64|arm64>` to package the local build.
 
 ## Command-line reader
 

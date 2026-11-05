@@ -41,7 +41,7 @@ def main() -> None:
             '--osx-bundle-identifier',
             'com.robertjooste.epubaudiobookmaker',
         ))
-    elif sys.platform == 'win32':
+    elif sys.platform in {'win32', 'linux'}:
         command.append('--onefile')
     command.append('desktop_app.py')
     subprocess.run(command, check=True)
