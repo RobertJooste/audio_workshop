@@ -1,3 +1,4 @@
+import os
 import tarfile
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -26,6 +27,7 @@ class PortablePackagingTests(unittest.TestCase):
             )
             self.assertEqual(result.read_bytes(), b'portable executable')
 
+    @unittest.skipIf(os.name == 'nt', 'Windows does not preserve POSIX executable bits.')
     def test_linux_archive_contains_executable_and_launch_instructions(self):
         with TemporaryDirectory() as temporary_directory:
             root = Path(temporary_directory)

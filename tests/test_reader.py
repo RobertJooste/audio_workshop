@@ -358,10 +358,12 @@ class AudioOutputTests(unittest.TestCase):
         output_stream = MagicMock()
         output_stream.__enter__.return_value = output_stream
         output_stream.write.side_effect = lambda block: writes.append(block.copy())
+        sounddevice = MagicMock()
+        sounddevice.OutputStream.return_value = output_stream
 
         with (
+            patch.dict('sys.modules', {'sounddevice': sounddevice}),
             patch('sys.stdin', input_stream),
-            patch.object(reader.sd, 'OutputStream', return_value=output_stream),
             patch.object(reader.select, 'select', side_effect=[
                 (ready, [], []) for ready in ready_states
             ]),

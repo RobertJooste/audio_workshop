@@ -15,7 +15,6 @@ from urllib.parse import unquote, urlsplit
 
 import fitz
 import numpy as np
-import sounddevice as sd
 import soundfile as sf
 from bs4 import BeautifulSoup
 import ebooklib
@@ -461,6 +460,8 @@ def synthesize(
 
 
 def play_audio(audio: np.ndarray, sample_rate: int, device: int | None = None):
+    import sounddevice as sd
+
     samples = np.asarray(audio, dtype=np.float32)
     if samples.ndim == 1:
         samples = samples[:, np.newaxis]

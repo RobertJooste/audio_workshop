@@ -31,8 +31,6 @@ def main() -> None:
         'onnxruntime',
         'espeakng_loader',
         'phonemizer',
-        'sounddevice',
-        'soundfile',
         'fitz',
     ):
         command.extend(('--collect-all', package))
